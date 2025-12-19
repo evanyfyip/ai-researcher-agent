@@ -1,0 +1,88 @@
+tools:
+  arxiv:
+    topics: ["machine learning", "neural networks", "artificial intelligence", "deep learning", "embedding"]
+    max_results: 5
+  webscrapers:
+    towardsdatascience:
+      type: "html"
+      description: "Latest articles from Towards Data Science"
+      base_url: "https://towardsdatascience.com/latest/"
+      article_selector: "li.wp-block-post"
+      title_selector: "h2 > a"
+      link_selector: "h2 > a"
+      summary_selector: "p"
+      date_selector: "time" 
+      max_results: 10
+    dailydoseofdatascience:
+      type: "html"
+      description: "Latest articles from Daily Dose of Data Science"
+      base_url: "https://www.dailydoseofds.com/"
+      article_selector: "div.post-feed > article.post-card"
+      title_selector: "h2 > a"
+      link_selector: "h2 > a"
+      summary_selector: "p"
+      date_selector: "time"
+      max_results: 10
+    microsoftfoundry:
+      type: "html"
+      description: "Latest articles from Microsoft Foundry Blog"
+      base_url: "https://devblogs.microsoft.com/foundry/"
+      article_selector: "div.archive-posts > div.masonry-card > div.card-body"
+      title_selector: "h3 > a"
+      link_selector: "h3 > a"
+      summary_selector: "p"
+      date_selector: "div.card-top > div > div"
+      max_results: 10
+    anthropicnews:
+      type: "html"
+      description: "Latest articles from Anthropic News"
+      base_url: "https://www.anthropic.com/news"
+      article_selector: "ul.PublicationList-module-scss-module__KxYrHG__list > li"
+      title_selector: "a"
+      link_selector: "a"
+      summary_selector: "a > span"
+      date_selector: "time"  # Assume recent
+      max_results: 10
+    googleai: 
+      type: "html"
+      description: "Latest articles from Google AI Blog"
+      base_url: "https://blog.google/technology/ai/"
+      article_selector: "li > uni-article-card"
+      title_selector: "a > h3"
+      link_selector: "a"
+      summary_selector: null
+      date_selector: "header > span.eyebrow__date"
+      max_results: 10
+      use_playwright: true
+    awsai:
+      type: "html"
+      description: "Latest articles from AWS AI Blog"
+      base_url: "https://aws.amazon.com/blogs/aws/category/artificial-intelligence/"
+      article_selector: "article.blog-post"
+      title_selector: "h2 > a > span"
+      link_selector: "h2 > a"
+      summary_selector: "section.blog-post-excerpt > p"
+      date_selector: "span > time"
+      max_results: 12
+    openai:
+      type: "html"
+      description: "Latest articles from OpenAI Research News"
+      base_url: "https://openai.com/news/research/?display=list"
+      article_selector: "div.grid > div.py-md"
+      title_selector: "a > div > div.mb-2xs"
+      link_selector: "a"
+      summary_selector: "p"
+      date_selector: "time"
+      max_results: 10
+
+llm:
+  model: "claude-opus-4-5"
+  temperature: 0
+  azure_endpoint: ""  # Set via AZURE_OPENAI_ENDPOINT
+  api_version: "2024-02-01"  # Or latest
+
+days_back: 5 # Number of days to look back for recent articles
+
+mcp:
+  host: "localhost"
+  port: 3000

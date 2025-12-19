@@ -1,0 +1,31 @@
+[project]
+name = "ai-researcher-agent"
+version = "0.1.0"
+description = "AI Researcher Agent as MCP Tool"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain",
+    "langchain-community",
+    "langchain-openai",
+    "langchain-anthropic",
+    "pydantic",
+    "requests",
+    "beautifulsoup4",
+    "arxiv",
+    "feedparser",
+    "pyyaml",
+    "fastmcp",
+    "azure-identity",
+    "ipykernel>=7.1.0",
+    "python-dateutil>=2.9.0.post0",
+    "playwright>=1.57.0",
+    "markdown>=3.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
