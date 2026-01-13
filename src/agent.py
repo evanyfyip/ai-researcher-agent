@@ -7,6 +7,7 @@ from src.html_formatter import HTMLFormatter
 import yaml
 import os
 from typing import List, Tuple, Dict, Any
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class ResearcherAgent:
     def __init__(self, config_path: str = "config.yaml"):
@@ -165,24 +166,56 @@ class ResearcherAgent:
             return "https://www.google.com"
         return ""
 
+    def _source_description(self, name: str, instance) -> str:
+        """Return a human-friendly description for a source if available."""
+        if hasattr(instance, "config") and isinstance(getattr(instance, "config", None), dict):
+            return instance.config.get("description", "")
+        return ""
+
     def pulse_search(self, output_format: str = "markdown", return_data: bool = False) -> str | Tuple[str, Dict[str, Any]]:
         """Aggregate latest from all tools."""
         days_back = self.config.get('days_back', 1)
         sections_md = []
         sources = []
-        for name, instance in self.tool_instances.items():
+
+        tool_items = list(self.tool_instances.items())
+
+        def _process_source(name: str, instance) -> Dict[str, Any]:
             res = instance.get_recent(days_back=days_back)
             formatted_res = instance.format_output(res)
-            
             summary = self._generate_source_summary(formatted_res)
-
-            sections_md.append(f"## {name}\n{summary}\n\n{formatted_res}")
-            sources.append({
+            return {
                 "name": name,
+                "description": self._source_description(name, instance),
                 "summary": summary,
                 "items": res,
+                "formatted_res": formatted_res,
                 "banner_url": self.banner_map.get(name),
                 "source_url": self._source_url(name, instance),
+            }
+
+        results_by_name = {}
+        parallelism = self.config.get("parallelism", {})
+        max_workers = parallelism.get("max_workers", 8)
+        with ThreadPoolExecutor(max_workers=min(max_workers, len(tool_items) or 1)) as executor:
+            future_map = {
+                executor.submit(_process_source, name, instance): name
+                for name, instance in tool_items
+            }
+            for future in as_completed(future_map):
+                name = future_map[future]
+                results_by_name[name] = future.result()
+
+        for name, _ in tool_items:
+            result = results_by_name[name]
+            sections_md.append(f"## {name}\n{result['summary']}\n\n{result['formatted_res']}")
+            sources.append({
+                "name": result["name"],
+                "description": result["description"],
+                "summary": result["summary"],
+                "items": result["items"],
+                "banner_url": result["banner_url"],
+                "source_url": result["source_url"],
             })
 
         combined_results = "\n\n".join(sections_md)

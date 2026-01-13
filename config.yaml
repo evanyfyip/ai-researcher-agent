@@ -3,39 +3,54 @@ tools:
     topics: ["machine learning", "neural networks", "artificial intelligence", "deep learning", "embedding"]
     max_results: 5
   webscrapers:
-    towardsdatascience:
-      type: "html"
-      description: "Latest articles from Towards Data Science"
-      base_url: "https://towardsdatascience.com/latest/"
-      article_selector: "li.wp-block-post"
-      title_selector: "h2 > a"
-      link_selector: "h2 > a"
-      summary_selector: "p"
-      date_selector: "time" 
+    langchain:
+      type: "rss"
+      description: "LangChain blog"
+      url: "https://blog.langchain.dev/rss/"
       max_results: 10
-    dailydoseofdatascience:
-      type: "html"
-      description: "Latest articles from Daily Dose of Data Science"
-      base_url: "https://www.dailydoseofds.com/"
-      article_selector: "div.post-feed > article.post-card"
-      title_selector: "h2 > a"
-      link_selector: "h2 > a"
-      summary_selector: "p"
-      date_selector: "time"
+    kdnuggets:
+      type: "rss"
+      description: "KDnuggets (data science news)"
+      url: "https://www.kdnuggets.com/feed"
+      max_results: 10
+    jmlr:
+      type: "rss"
+      description: "JMLR (Journal of Machine Learning Research)"
+      url: "https://www.jmlr.org/jmlr.xml"
+      max_results: 10
+    arxiv_cs_lg:
+      type: "rss"
+      description: "arXiv CS Machine Learning"
+      url: "https://rss.arxiv.org/rss/cs.LG"
+      max_results: 10
+    arxiv_cs_ai:
+      type: "rss"
+      description: "arXiv Artificial Intelligence"
+      url: "https://rss.arxiv.org/rss/cs.AI"
+      max_results: 10
+    arxiv_stat_ml:
+      type: "rss"
+      description: "arXiv Statistics Machine Learning"
+      url: "https://rss.arxiv.org/rss/stat.ML"
+      max_results: 10
+    towardsdatascience:
+      type: "rss"
+      description: "Towards Data Science"
+      url: "https://towardsdatascience.com/feed/"
       max_results: 10
     microsoftfoundry:
-      type: "html"
-      description: "Latest articles from Microsoft Foundry Blog"
-      base_url: "https://devblogs.microsoft.com/foundry/"
-      article_selector: "div.archive-posts > div.masonry-card > div.card-body"
-      title_selector: "h3 > a"
-      link_selector: "h3 > a"
-      summary_selector: "p"
-      date_selector: "div.card-top > div > div"
+      type: "rss"
+      description: "Microsoft Foundry Blog"
+      url: "https://devblogs.microsoft.com/foundry/feed/"
       max_results: 10
+    awsai:
+      type: "rss"
+      description: "AWS AI Blog"
+      url: "https://aws.amazon.com/blogs/aws/category/artificial-intelligence/feed/"
+      max_results: 12
     anthropicnews:
       type: "html"
-      description: "Latest articles from Anthropic News"
+      description: "Anthropic News"
       base_url: "https://www.anthropic.com/news"
       article_selector: "ul.PublicationList-module-scss-module__KxYrHG__list > li"
       title_selector: "a"
@@ -45,7 +60,7 @@ tools:
       max_results: 10
     googleai: 
       type: "html"
-      description: "Latest articles from Google AI Blog"
+      description: "Google AI Blog"
       base_url: "https://blog.google/technology/ai/"
       article_selector: "li > uni-article-card"
       title_selector: "a > h3"
@@ -54,19 +69,9 @@ tools:
       date_selector: "header > span.eyebrow__date"
       max_results: 10
       use_playwright: true
-    awsai:
-      type: "html"
-      description: "Latest articles from AWS AI Blog"
-      base_url: "https://aws.amazon.com/blogs/aws/category/artificial-intelligence/"
-      article_selector: "article.blog-post"
-      title_selector: "h2 > a > span"
-      link_selector: "h2 > a"
-      summary_selector: "section.blog-post-excerpt > p"
-      date_selector: "span > time"
-      max_results: 12
     openai:
       type: "html"
-      description: "Latest articles from OpenAI Research News"
+      description: "OpenAI Research News"
       base_url: "https://openai.com/news/research/?display=list"
       article_selector: "div.grid > div.py-md"
       title_selector: "a > div > div.mb-2xs"
@@ -74,6 +79,27 @@ tools:
       summary_selector: "p"
       date_selector: "time"
       max_results: 10
+    # towardsdatascience:
+    #   type: "html"
+    #   description: "Latest articles from Towards Data Science"
+    #   base_url: "https://towardsdatascience.com/latest/"
+    #   article_selector: "li.wp-block-post"
+    #   title_selector: "h2 > a"
+    #   link_selector: "h2 > a"
+    #   summary_selector: "p"
+    #   date_selector: "time" 
+    #   max_results: 10
+    # dailydoseofdatascience:
+    #   type: "html"
+    #   description: "Latest articles from Daily Dose of Data Science"
+    #   base_url: "https://www.dailydoseofds.com/"
+    #   article_selector: "div.post-feed > article.post-card"
+    #   title_selector: "h2 > a"
+    #   link_selector: "h2 > a"
+    #   summary_selector: "p"
+    #   date_selector: "time"
+    #   max_results: 10
+    
 
 llm:
   model: "claude-opus-4-5"
@@ -82,6 +108,9 @@ llm:
   api_version: "2024-02-01"  # Or latest
 
 days_back: 5 # Number of days to look back for recent articles
+
+parallelism:
+  max_workers: 8 # Max concurrent sources processed in pulse_search
 
 mcp:
   host: "localhost"

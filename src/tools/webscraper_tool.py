@@ -1,6 +1,7 @@
 from .base_tool import ResearchTool
 from typing import List, Dict, Any
 import requests
+import html
 from bs4 import BeautifulSoup
 import feedparser
 from datetime import datetime, timedelta, timezone
@@ -28,36 +29,87 @@ class WebScraperTool(ResearchTool):
             return self._search_html(query, topics, days_back)
         else:
             return []
+    def _best_rss_text(self, entry) -> str:
+        # 1) Prefer full content blocks if present
+        if getattr(entry, "content", None):
+            # entry.content is usually a list of dict-like objects
+            val = entry.content[0].get("value") if entry.content else None
+            if val:
+                return val
+
+        # 2) Some feeds store full HTML in these fields
+        for key in ("content_encoded", "content:encoded", "description", "summary"):
+            val = getattr(entry, key, None)
+            if val:
+                return val
+
+        return "No summary"
+    
+    def _clean_html_fragment(self, s: str) -> str:
+        # Unescape &lt; &amp; etc.
+        s = html.unescape(s)
+        # Strip HTML tags while keeping readable text
+        return BeautifulSoup(s, "html.parser").get_text(" ", strip=True)
+
+    def _is_year_only_date(self, date_str: str | None) -> bool:
+        if not date_str:
+            return False
+        return bool(re.fullmatch(r"\d{4}", date_str.strip()))
 
     def _search_rss(self, query: str, topics: List[str] = None, days_back: int = 7) -> List[Dict[str, Any]]:
-        feed = feedparser.parse(self.config['url'])
+        feed_url = self.config.get("url") or self.config.get("feed_url")
+        if not feed_url:
+            return []
+
+        feed = feedparser.parse(feed_url)
         results = []
         since = datetime.now(timezone.utc) - timedelta(days=days_back)
+        max_results = self.config.get("max_results", 5)
 
         for entry in feed.entries:
-            published = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc) if entry.published_parsed else datetime.now(timezone.utc)
-            if published >= since:
-                title = entry.title
-                summary = entry.summary if 'summary' in entry else "No summary"
-                link = entry.link
-                # Filter by topics if provided
-                content = (title + " " + summary).lower()
-                if topics:
-                    if not any(topic.lower() in content for topic in topics):
-                        continue
-                elif query:
-                    if query.lower() not in content:
-                        continue
-                else:
-                    if not any(topic.lower() in content for topic in self.topics):
-                        continue
-                results.append({
-                    'title': title,
-                    'summary': summary[:300] + "..." if len(summary) > 300 else summary,
-                    'link': link,
-                    'date': published.strftime('%Y-%m-%d')
-                })
-        return results[:5]
+            # published_parsed may be missing; try updated_parsed; else skip recency filter
+            published_dt = None
+            if getattr(entry, "published_parsed", None):
+                published_dt = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+            elif getattr(entry, "updated_parsed", None):
+                published_dt = datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
+
+            published_text = getattr(entry, "published", None) or getattr(entry, "updated", None)
+            year_only_date = self._is_year_only_date(published_text)
+
+            if published_dt and published_dt < since and not year_only_date:
+                continue
+
+            title = getattr(entry, "title", "No title")
+            raw = self._best_rss_text(entry)
+            summary = self._clean_html_fragment(raw)
+            link = getattr(entry, "link", "#")
+
+            content = (title + " " + summary).lower()
+            effective_topics = topics if topics is not None else self.topics
+
+            if topics:
+                if not any(t.lower() in content for t in topics):
+                    continue
+            elif query:
+                if query.lower() not in content:
+                    continue
+            else:
+                if effective_topics and not any(t.lower() in content for t in effective_topics):
+                    continue
+
+            date_str = (published_dt or datetime.now(timezone.utc)).strftime("%Y-%m-%d")
+            results.append({
+                "title": title,
+                "summary": (summary[:300] + "...") if len(summary) > 300 else summary,
+                "link": link,
+                "date": date_str,
+            })
+
+            if len(results) >= max_results:
+                break
+
+        return results
 
     def _search_html(self, query: str, topics: List[str] = None, days_back: int = 7) -> List[Dict[str, Any]]:
         search_terms = topics + [query] if query else topics if topics else self.topics

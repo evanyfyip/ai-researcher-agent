@@ -44,7 +44,7 @@ class HTMLFormatter:
             title = escape(post.get("title", "No title"))
             link = escape(post.get("link", "#"), quote=True)
             date = escape(post.get("date", "Unknown date"))
-            summary = escape(post.get("summary", "")[:260])
+            summary = escape(post.get("summary", ""))
             items.append(
                 """
                 <li class=\"post\">
@@ -126,13 +126,14 @@ class HTMLFormatter:
             banner_url = escape(source.get("banner_url") or f"assets/banners/{safe_banner}.jpg", quote=True)
             source_url = escape(source.get("source_url") or "#", quote=True)
             source_id = escape(name.lower().replace(" ", "_"))
+            display_title = source.get("description") or name
             page.extend(
                 [
                     f"<div class=\"section source-card\" style=\"--accent:{accent};\">",
                     f"<div class=\"card-banner\" style=\"background-image:url('{banner_url}');\"></div>",
                     "<div class=\"source-header\">",
                     "<div class=\"source-head-left\">",
-                    f"<h1 class=\"source-title\">{escape(name)}</h1>",
+                    f"<h1 class=\"source-title\">{escape(display_title)}</h1>",
                     f"<a class=\"source-link\" href=\"{source_url}\" target=\"_blank\" rel=\"noopener\">link</a>",
                     "</div>",
                     f"<button class=\"source-toggle\" data-target=\"{source_id}\">Expand</button>",
