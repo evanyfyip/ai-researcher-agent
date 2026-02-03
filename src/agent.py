@@ -93,6 +93,8 @@ class ResearcherAgent:
         Produce a three sentence overview sentence (Call it AI Research Roundup) and produce a concise markdown bullet list.
         For each source, give ONE line that captures what to check out next, and note
         which categories apply: Tools & Technologies, Foundational Knowledge, Risks & governance.
+        Include a short source tag for each line indicating where the update came from
+        (e.g., "(arxiv)", "(google ai)", "(medium)").
         Keep it crisp and scannable.
 
         Here are the category details:
@@ -119,23 +121,23 @@ class ResearcherAgent:
         ## Key Updates: 
         1. **Tools & Technologies:**
 
-            - OpenAI’s GPT-5.2-Codex debuts as an agentic coding model with detailed safety mitigations for professional software engineering and cybersecurity work.
+            - OpenAI’s GPT-5.2-Codex debuts as an agentic coding model with detailed safety mitigations for professional software engineering and cybersecurity work. (openai)
 
-            - Google Gemini 3 Flash launches with “frontier intelligence built for speed,” optimizing inference performance without sacrificing capability.
+            - Google Gemini 3 Flash launches with “frontier intelligence built for speed,” optimizing inference performance without sacrificing capability. (google ai)
 
-            - Microsoft Foundry rebrand signals expanded platform scope beyond Azure, unifying AI development tools, agents, and model deployment.
+            - Microsoft Foundry rebrand signals expanded platform scope beyond Azure, unifying AI development tools, agents, and model deployment. (microsoft)
 
         2. **Foundational Knowledge**
 
-            - OpenAI’s Chain-of-Thought Monitorability research evaluates how reasoning transparency scales—critical reading for AI safety practitioners.
+            - OpenAI’s Chain-of-Thought Monitorability research evaluates how reasoning transparency scales—critical reading for AI safety practitioners. (openai)
 
-            - Next-Embedding Prediction for Vision applies NLP-style generative pretraining to visual learning, predicting embeddings rather than raw features.
+            - Next-Embedding Prediction for Vision applies NLP-style generative pretraining to visual learning, predicting embeddings rather than raw features. (arxiv)
 
         3. **Risks & Governance:**
 
-            - Anthropic’s California SB53 compliance framework introduces a transparency reporting approach that may set industry precedents for AI regulation.
+            - Anthropic’s California SB53 compliance framework introduces a transparency reporting approach that may set industry precedents for AI regulation. (anthropic)
 
-            - OpenAI’s Chain-of-Thought Monitorability research highlights implications for safety and governance as reasoning transparency scales.
+            - OpenAI’s Chain-of-Thought Monitorability research highlights implications for safety and governance as reasoning transparency scales. (openai)
             
         </RESPONSE>
 
